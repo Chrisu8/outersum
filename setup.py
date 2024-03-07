@@ -8,7 +8,7 @@ setup(
     description='A package for calculating and analyzing outer sums from genomic data.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url='https://github.com/yourusername/outersum',  # URL to your package's repository
+    url='https://github.com/Chrisu8/outersum',  # URL to your package's repository
     packages=find_packages(),
     install_requires=[
         'numpy',
