@@ -1,12 +1,10 @@
-# the main function here is used for each party t get their outersum
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as sig
+from .utils import hann_window, one_block, anti_diagonal_sums  # Adjust based on your actual utility functions
 
-def hann_window(N):
-    # N is the filter width
-    return 0.5 * (1 - np.cos(2 * np.pi * np.arange(N) / (N - 1)))
 
+# Data Reading and Processing
 def read_data(file_path):
     data = []
     positions = set()
@@ -24,6 +22,7 @@ def read_data(file_path):
 
     return data, sorted(positions)
 
+#Matrix Creation
 def create_cov_matrix(data, position_map):
     size = len(position_map)
     matrix = np.zeros((size, size))
@@ -39,7 +38,6 @@ def create_cov_matrix(data, position_map):
             matrix[j][i] = shrinkage_cov
 
     return matrix
-
 
 def cov_cor_matrix(cov_matrix,):
     correlation_matrix = np.zeros(cov_matrix.shape)
@@ -85,62 +83,3 @@ def plot_data(positions, original_data, convolved_data):
     plt.legend()
     plt.grid(True)
     plt.show()
-
-#  create a square block
-def one_block(size):
-    return np.ones((size, size), dtype=int)
-def create_ld_matrix(matrix_size, block_sizes):
-    ld_matrix = np.zeros((matrix_size, matrix_size), dtype=int)
-
-    current_pos = 0
-    for block_size in block_sizes:
-        ld_matrix[current_pos:current_pos+block_size, current_pos:current_pos+block_size] = one_block(block_size)
-        current_pos += block_size  # move the starting position for the next block
-
-    return ld_matrix
-
-def anti_diagonal_sums(matrix):
-    n = len(matrix)
-    anti_diag_sums = []
-
-    # Process each anti-diagonal
-    for k in range(1, 2 * n):
-        vk = 0
-        for i in range(1, k + 1):
-            j = k - i + 1
-            # Check the bounds
-            if 1 <= i <= n and 1 <= j <= n:
-                vk += matrix[i - 1][j - 1]  # Subtracting 1 as matrix indices start from 0
-        anti_diag_sums.append(vk)
-
-    return np.array(anti_diag_sums)
-
-# Function to plot the anti-diagonal sums
-def plot_anti_diagonal_sums(anti_diag_sums):
-    # Create an array of indices, starting from 1
-    indices = np.arange(1, len(anti_diag_sums) + 1)
-
-    # Create the plot
-    plt.figure(figsize=(10, 6))
-    plt.plot(indices, anti_diag_sums, marker='o')
-
-    # Add title and labels
-    plt.title('Anti-diagonal Sums of the Matrix')
-    plt.xlabel('position on chromosome')
-    plt.ylabel('Sum r^2')
-
-    # Show grid lines
-    plt.grid(True)
-
-    # Show the plot
-    plt.show()
-
-
-
-file_path = 'example_data/chr2.39967768.40067768'
-data, positions = read_data(file_path)
-position_map = {pos: idx for idx, pos in enumerate(positions)}
-cov_matrix = create_cov_matrix(data, position_map)
-matrix = cov_cor_matrix(cov_matrix)
-outer_sums = calculate_outer_sums(matrix)
-
